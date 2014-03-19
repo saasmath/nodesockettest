@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>Real-time temperature in browser</title>
+</head>
+<body>
+    <h1>Using Raspberry Pi, Node.JS, Socket.IO to display real-time temperature in browser</h1>
+    <h2>Current temperature in C</h2>
+    <h2><p id="temperature"></p></h2>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+   
+    <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
+
+    <script>
+        var socket = io.connect('http://192.168.1.134:3001');
+        var temp = document.getElementById('temperature');
+        socket.on('temperature',function(data){
+            console.log('Connected');
+            temperature.innerHTML = data.number
+            temparr.push(data.number);
+        });
+    </script>
+</body>
+</html>
