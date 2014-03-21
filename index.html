@@ -1,26 +1,33 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/html">
-<head>
-    <title>Real-time temperature in browser</title>
-</head>
-<body>
-    <h1>Using Raspberry Pi, Node.JS, Socket.IO to display real-time temperature in browser</h1>
-    <h2>Current temperature in C</h2>
-    <h2><p id="temperature"></p></h2>
+<html>
+	<head>
+	</head>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="JQuery.js"></script>
+	<script>
+		$(document).ready(function(){
+			var socket = io.connect('http://saasmath.seattleacademy.org:443');
+			//$("#test").attr("color", "red");
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-   
-    <div id="container" style="min-width: 400px; height: 400px; margin: 0 auto"></div>
 
-    <script>
-        var socket = io.connect('http://192.168.1.134:3001');
-        var temp = document.getElementById('temperature');
-        socket.on('temperature',function(data){
-            console.log('Connected');
-            temperature.innerHTML = data.number
-            temparr.push(data.number);
-        });
-    </script>
-</body>
+			socket.on('serve', function (data) 
+			{
+				for(i = 0; i < data.length; i++)
+				{
+					$("#" + data[i][0]).attr(data[i][1], data[i][2]);
+
+					console.log(data[i][0] + ", " + data[i][1] + ", " + data[i][2]);
+				}
+			});
+
+			//when the button is clicked send the data to the server
+			$("#send").click(function(){
+				socket.emit('update', {"ID":"test", "Attribute":"color", "Value":"red"});
+			});
+		});
+	</script>
+	<body>
+		<font id = "test">thrg</font>
+		<button id = "send">Send</button>
+	</body>
 </html>

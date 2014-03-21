@@ -1,26 +1,46 @@
-var http = require('http');
-var fs = require('fs');
-var count = 0;
+var app = require('http').createServer(handler)
+var io = require('socket.io').listen(app)
+var fs = require('fs')
 
-var server = http.createServer(function(req,res){
-    fs.readFile('./index.html', function(error, data){
-        res.writeHead(200,{'Content-Type':'text/html'});
-        res.end(data, 'utf-8');
+app.listen(443);
+
+var Buffer = [];
+
+function handler (req, res) {
+  if(req.url == "/JQuery.js" || req.url == "JQuery.js")
+  {
+    fs.readFile(__dirname + '/JQuery.js',
+    function (err, data) {
+      if (err) {
+        res.writeHead(500);
+        return res.end('Error loading JQuery.js');
+      }
+
+      res.writeHead(200);
+      res.end(data);
     });
-}).listen(3001);
+  }
+  else
+  {
+    fs.readFile(__dirname + '/index.html',
+    function (err, data) {
+      if (err) {
+        res.writeHead(500);
+        return res.end('Error loading index.html');
+      }
 
-console.log('Server is running');
-
-var io = require('socket.io').listen(server);
-
-io.sockets.on('connection', function(socket){
-    console.log('User connected');
-    setInterval(function(){
-    fs.readFile('/sys/class/thermal/thermal_zone0/temp', function(error, data){
-        //console.log(data.toString()/1000);
-        socket.emit('temperature',{number: data.toString()/1000});
+      res.writeHead(200);
+      res.end(data);
     });
-    }, 1000);
+  }
+}
+
+io.sockets.on('connection', function (socket) 
+{
+  socket.on('update', function (data) 
+  {
+    Buffer.push([data["ID"], data["Attribute"], data["Value"]]);
+    //send message to all clients
+    io.sockets.emit('serve', Buffer);
+  });
 });
-
-
