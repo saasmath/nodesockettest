@@ -37,10 +37,17 @@ function handler (req, res) {
 
 io.sockets.on('connection', function (socket) 
 {
+  //on initial connection send out entire buffer
+  socket.emit('serve', Buffer);
+  console.log("First Serve");
+
+  //on update connection
   socket.on('update', function (data) 
   {
-    Buffer.push([data["ID"], data["Attribute"], data["Value"]]);
-    //send message to all clients
-    io.sockets.emit('serve', Buffer);
+    //add the data to the buffer to keep forever
+    Buffer.push(data);
+
+    //send most recent update out to client
+    io.sockets.emit('serve', [data]);
   });
 });

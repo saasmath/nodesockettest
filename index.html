@@ -3,26 +3,29 @@
 	<head>
 	</head>
 	<script src="/socket.io/socket.io.js"></script>
-	<script src="JQuery.js"></script>
+	<script src="http://code.jquery.com/jquery-latest.js"></script>
 	<script>
 		$(document).ready(function(){
 			var socket = io.connect('http://saasmath.seattleacademy.org:443');
 			//$("#test").attr("color", "red");
 
+			socket.on('connect', function(){
+				alert("hello");
+			});
 
-			socket.on('serve', function (data) 
+			socket.on('serve', function (data)
 			{
+				//change the attribute for all of the data sent
 				for(i = 0; i < data.length; i++)
 				{
 					$("#" + data[i][0]).attr(data[i][1], data[i][2]);
-
-					console.log(data[i][0] + ", " + data[i][1] + ", " + data[i][2]);
+					console.log(data[i][0] + " ," + data[i][1] + ", " + data[i][2])
 				}
 			});
 
 			//when the button is clicked send the data to the server
 			$("#send").click(function(){
-				socket.emit('update', {"ID":"test", "Attribute":"color", "Value":"red"});
+				socket.emit('update', ["test", "color", "red"]);
 			});
 		});
 	</script>
