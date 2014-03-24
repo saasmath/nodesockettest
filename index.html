@@ -1,36 +1,27 @@
 <!DOCTYPE html>
 <html>
 	<head>
+		<style>
+			
+		</style>
 	</head>
-	<script src="/socket.io/socket.io.js"></script>
-	<script src="http://code.jquery.com/jquery-latest.js"></script>
-	<script>
-		$(document).ready(function(){
-			var socket = io.connect('http://saasmath.seattleacademy.org:443');
-			//$("#test").attr("color", "red");
-
-			socket.on('connect', function(){
-				alert("hello");
-			});
-
-			socket.on('serve', function (data)
-			{
-				//change the attribute for all of the data sent
-				for(i = 0; i < data.length; i++)
-				{
-					$("#" + data[i][0]).attr(data[i][1], data[i][2]);
-					console.log(data[i][0] + " ," + data[i][1] + ", " + data[i][2])
-				}
-			});
-
-			//when the button is clicked send the data to the server
-			$("#send").click(function(){
-				socket.emit('update', ["test", "color", "red"]);
-			});
-		});
-	</script>
+		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+		<script type="text/javascript" src="remote.js"></script>
+		<script type="text/javascript" src="main.js"></script>
 	<body>
-		<font id = "test">thrg</font>
-		<button id = "send">Send</button>
+		<p>The button has an ID of test</p>
+		<p>The text has an ID of test2</p>
+
+		<br/>
+		
+		<input id = "Text" type="radio" name="changetype" value="Text">Text</input>
+		<input id = "Attribute" type="radio" name="changetype" value="Attribute">Attribute</input>
+
+		<p>selector: <input id = "selector"></input></p>
+		<p>attribute: <input id = "attribute"></input></p>
+		<p>value: <input id = "value"></input></p>
+		<p><button id = "send">Send</button></p>
+		<p id = "test2">this is the button that you will change: </p><button id = "test">test</button></b>
 	</body>
 </html>
