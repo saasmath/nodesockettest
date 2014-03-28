@@ -28,6 +28,10 @@ $(document).ready(function()
 			{
 				$(data[i][1]).text(data[i][2]);
 			}
+			else if(data[i][0] == "AddNode")
+			{
+				$(data[i][1]).append(data[i][2]);
+			}
 
 			console.log(data[i][0] + ": " + data[i][1] + ", " + data[i][2]);
 		}
@@ -42,4 +46,9 @@ function RemoteAttribute(Selector, Attribute, Value)
 function RemoteText(Selector, Value)
 {
 	socket.emit('update', ["Text", Selector, Value]);
+}
+
+function RemoteAddNode(Selector, Value)
+{
+	socket.emit('update', ["AddNode", Selector, Value]);
 }

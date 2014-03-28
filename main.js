@@ -9,5 +9,10 @@ $(document).ready(function (){
 		{
 			RemoteText($("#selector").val(), $("#value").val());
 		}
+
+		else if($('#AddNode').is(':checked'))
+		{
+			RemoteAddNode($("#selector").val(), $("#value").val());
+		}
 	});
 });

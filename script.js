@@ -18,9 +18,7 @@ $(document).ready(function() {
 
     $('.court').click(function(event) {
         console.log(event);
-        $('<div class="shot">x<div/>').appendTo(this)
-                .css('top', event.offsetY)
-                .css('left', event.offsetX);
+        RemoteAddNode(".court", "<div style = 'top:" + event.offsetY + "px; left:" + event.offsetX + "px;' class='shot'>x<div/>");
     });
 
     $('.hometwopoint').click(function(event) {

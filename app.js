@@ -13,6 +13,28 @@ var io = require('socket.io').listen(server);
 //initializes global variables
 var Buffer = [];
 
+function AddToBuffer(BufferArray)
+{
+  if(BufferArray[0] == "AddNode")
+  {
+    Buffer.push(BufferArray);
+    return 1;
+  }
+
+  for(i = 0; i < Buffer.length; i++)
+  {
+    if(Buffer[i][0] == BufferArray[0] && Buffer[i][1] == BufferArray[1])
+    {
+      Buffer[i] = BufferArray;
+      console.log("Replace");
+      return 1;
+    }
+  }
+
+  Buffer.push(BufferArray);
+  return 1;
+}
+
 //once the connection is established
 io.sockets.on('connection', function (socket) 
 {
@@ -28,7 +50,9 @@ io.sockets.on('connection', function (socket)
   socket.on('update', function (data)
   {
     //add the data to the buffer to keep forever
-    Buffer.push(data);
+    AddToBuffer(data);
+
+    //
 
     //send most recent update out to client
     io.sockets.emit('serve', [data]);
