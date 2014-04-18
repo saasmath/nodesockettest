@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<style>
+			
+		</style>
+	</head>
+		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
+		<script type="text/javascript" src="http://code.jquery.com/jquery-latest.js"></script>
+		<script type="text/javascript" src="remote.js"></script>
+		<script>
+			$(document).ready(function()
+			{
+				var Data = {"X": 0, "Y": 0};
+				var Canvas = document.getElementById("Canvas");
+				var Context = Canvas.getContext("2d");
+
+				$("#Canvas").on('mousemove', function(e) 
+				{
+					Data.X = e.pageX;
+					Data.Y = e.pageY;
+				});
+
+				//draw function that draws from latest server data
+				function Draw()
+				{
+					Context.clearRect(0, 0, Canvas.width, Canvas.height);
+
+					Users = Object.keys(ServerData);
+
+					for(i = 0; i < Users.length; i++)
+					{
+						var CurrentX = ServerData[Users[i]].X;
+						var CurrentY = ServerData[Users[i]].Y;
+
+						Context.fillRect(CurrentX, CurrentY, 10, 10);
+					}
+				}
+
+				//call the update function every 500 ms
+				window.setInterval(function()
+				{
+					ServerUpdate({"User": $("#Username").val(), "Data":Data});
+					Draw()
+				}, 50);
+			});
+		</script>
+	<body>
+		<canvas id="Canvas" width="200" height="200" style="border:1px solid #000000;"></canvas> 
+		<p>Username (you must put this in):</p><input id = "Username" type="text">
+	</body>
+</html>
