@@ -14,10 +14,6 @@ var io = require('socket.io').listen(server);
 var Data = {};
 var Time = {};
 
-function SendJSON()
-{
-  io.sockets.emit('serve', JSON.stringify(Data));
-}
 
 function UpdateJSON(JSONString)
 {
@@ -38,7 +34,7 @@ function EliminateTimeouts()
   {
     var CurrentTime = new Date().getTime();
 
-    if(CurrentTime - Time[Users[i]] > 10000)
+    if(CurrentTime - Time[Users[i]] > 1000)
     {
       delete Time[Users[i]];
       delete Data[Users[i]];
@@ -50,7 +46,7 @@ function EliminateTimeouts()
 io.sockets.on('connection', function (socket) 
 {
   //send the json object
-  SendJSON();
+  socket.emit('serve', JSON.stringify(Data));
 
   //on update connection
   socket.on('update', function (data)
@@ -64,6 +60,11 @@ io.sockets.on('connection', function (socket)
     UpdateJSON(data);
 
     //send the json object
-    SendJSON();
+    socket.emit('serve', JSON.stringify(Data));
+  });
+
+  socket.on('chat', function (data)
+  {
+    io.sockets.emit('chat', data);
   });
 });

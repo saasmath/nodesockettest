@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<style>
-			
+
 		</style>
 	</head>
 		<script type="text/javascript" src="/socket.io/socket.io.js"></script>
@@ -11,42 +11,146 @@
 		<script>
 			$(document).ready(function()
 			{
-				var Data = {"X": 0, "Y": 0};
+				//declares data (where all data to send server goes)
+				var Data = {"X": 0, "Y": 0, "Vector": {"X": 0, "Y": 0}};
+				var DataPrevious = JSON.parse(JSON.stringify(Data));
+				var ServerDataBuffer;
+
+				//variable to contain your username
+				var Username = "";
+
+				//acceleration data
+				AccelX = 0;
+				AccelY = 0;
+				
+				//sets up canvas
 				var Canvas = document.getElementById("Canvas");
 				var Context = Canvas.getContext("2d");
 
-				$("#Canvas").on('mousemove', function(e) 
+				//gets keypresses
+				$(document).on('keydown', function(e) 
 				{
-					Data.X = e.pageX;
-					Data.Y = e.pageY;
+				    if(e.which == 37)
+				    {
+		    	        AccelX-=.1;
+			        }
+				        
+		   		    if(e.which == 38)
+				    {
+		    	        AccelY-=.1;
+			        }
+				        
+	      		    if(e.which == 39)
+				    {
+		    	        AccelX+=.1;
+			        }
+
+		   		    if(e.which == 40)
+				    {
+		    	        AccelY+=.1;
+			        }
 				});
+
+				function UpdateData()
+				{
+					//updates username
+					Username = $("#Username").val();
+
+					//calculate vectors from previous position and current position
+					Data.Vector.X = (DataPrevious.X - Data.X);
+					Data.Vector.Y = (DataPrevious.Y - Data.Y);
+
+					//sends data to server using remote.js
+					ServerUpdate({"User": Username, "Data":Data});
+
+					//copy the newly recieved server data into the ServerDataBuffer
+					ServerDataBuffer = JSON.parse(JSON.stringify(ServerData));
+
+					//stores the old data
+					DataPrevious = JSON.parse(JSON.stringify(Data));
+				}
 
 				//draw function that draws from latest server data
 				function Draw()
 				{
+					//clears the screen
 					Context.clearRect(0, 0, Canvas.width, Canvas.height);
 
+					//gets all of the usernames
 					Users = Object.keys(ServerData);
 
+					//for each user
 					for(i = 0; i < Users.length; i++)
 					{
-						var CurrentX = ServerData[Users[i]].X;
-						var CurrentY = ServerData[Users[i]].Y;
+						if(Users[i] != Username)
+						{
+							//get the x and y from the server JSON
+							var CurrentX = ServerData[Users[i]].X;
+							var CurrentY = ServerData[Users[i]].Y;
 
-						Context.fillRect(CurrentX, CurrentY, 10, 10);
+							//draw a rectangle at this x and y
+							Context.fillRect(CurrentX, CurrentY, 10, 10);
+						}
+						//uses perfect data for your own user
+						else
+						{
+							Context.fillRect(Data.X, Data.Y, 10, 10);
+						}
 					}
 				}
 
-				//call the update function every 500 ms
+				function Acceleration()
+				{
+					Data.X += AccelX;
+					Data.Y += AccelY;
+
+					if(Data.Y > Canvas.width || Data.Y < 0)
+					{
+						AccelY *= -1;
+					}
+
+					if(Data.X > Canvas.height || Data.X < 0)
+					{
+						AccelX *= -1;
+					}
+				}
+
+				function UpdatePositions()
+				{
+					//gets all of the usernames
+					Users = Object.keys(ServerData);
+
+					//update data for each user temporarily
+					for(i = 0; i < Users.length; i++)
+					{
+						//update the data only if it's not your username
+						if(Users[i] != Username)
+						{
+							//get the x and y from the server JSON
+							//if you are updating less than you are drawing, Vector * updaterate/drawrate
+							ServerData[Users[i]].X -= ServerData[Users[i]].Vector.X / 4;
+							ServerData[Users[i]].Y -= ServerData[Users[i]].Vector.Y / 4;
+						}	
+					}
+				}
+
 				window.setInterval(function()
 				{
-					ServerUpdate({"User": $("#Username").val(), "Data":Data});
-					Draw()
-				}, 50);
+					//send a server update if the data has changed
+					UpdateData();
+				}, 100);
+
+				window.setInterval(function()
+				{
+					//updates all the graphics
+					UpdatePositions();
+					Acceleration();
+					Draw();
+				}, 25);
 			});
 		</script>
 	<body>
-		<canvas id="Canvas" width="200" height="200" style="border:1px solid #000000;"></canvas> 
-		<p>Username (you must put this in):</p><input id = "Username" type="text">
+		<canvas id="Canvas" width="400" height="400" style="border:1px solid #000000;"></canvas> 
+		<p>Username: </p><input id = "Username" type="text">
 	</body>
 </html>

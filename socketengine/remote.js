@@ -2,6 +2,16 @@
 var socket;
 var ServerData;
 
+function ServerUpdate(JSONObject)
+{
+	socket.emit('update', JSON.stringify(JSONObject));
+}
+
+function Chat(Data)
+{
+	socket.emit('chat', Data);
+}
+
 //once the document is ready
 $(document).ready(function()
 {
@@ -21,9 +31,10 @@ $(document).ready(function()
 		//make the change for all of the data sent
 		ServerData = JSON.parse(data);
 	});
-});
 
-function ServerUpdate(JSONObject)
-{
-	socket.emit('update', JSON.stringify(JSONObject));
-}
+	socket.on('chat', function (data)
+	{
+		//chat functionality here
+		alert(data);
+	});
+});
